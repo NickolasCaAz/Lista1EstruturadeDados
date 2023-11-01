@@ -15,39 +15,95 @@ typedef struct ListaAlunos {
     int numElem;
 } ListaAlunos;
 
-typedef struct Aluno {
-    char nome[20];
-    int matricula;
-    float nota;
-} Aluno;
+void preencheAluno(Aluno* ptrAluno, int matricula, float nota, char* nome) {
+    ptrAluno->matricula = matricula;
+    ptrAluno->nota = nota;
+    strcpy(ptrAluno->nome, nome);
+}
 
+void inicializaLista(ListaAlunos* listaAlunos) {
+    listaAlunos->numElem = 0;
+}
 
-typedef struct ListaAlunos {
-    Aluno alunos[MAXSIZE];
-    int numElem;
-} ListaAlunos;
+void exibeLista(ListaAlunos* listaAlunos) {
+    int index;
+    printf("Exibindo lista...\n");
+    for (index = 0; index < listaAlunos->numElem; index++) {
+        printf("Aluno %d\n", index);
+        printf("Nome: %s\n", listaAlunos->alunos[index].nome);
+        printf("Matricula: %d\n", listaAlunos->alunos[index].matricula);
+        printf("Nota: %.1f\n", listaAlunos->alunos[index].nota);
+    }
+}
 
+bool insereAlunoNaLista(ListaAlunos* listaAlunos, Aluno aluno, int posicao) {
+    if (listaAlunos->numElem >= MAXSIZE || posicao < 0 || posicao > MAXSIZE || posicao > listaAlunos->numElem) {
+        printf("Insercao em posicao invalida!!!\n");
+        return false;
+    }
+
+    int index;
+    for (index = listaAlunos->numElem; index > posicao; index--) {
+        listaAlunos->alunos[index] = listaAlunos->alunos[index - 1];
+    }
+    listaAlunos->alunos[posicao] = aluno;
+    listaAlunos->numElem++;
+    return true;
+}
+
+bool excluiElementoDaLista(ListaAlunos* listaAlunos, int posicao) {
+    if (posicao < 0 || posicao >= listaAlunos->numElem) {
+        printf("Exclusao em posicao invalida!!!\n");
+        return false;
+    }
+
+    int index;
+    for (index = posicao; index < listaAlunos->numElem - 1; index++) {
+        listaAlunos->alunos[index] = listaAlunos->alunos[index + 1];
+    }
+    listaAlunos->numElem--;
+    return true;
+}
+
+int buscaAlunoPorNome(ListaAlunos* listaAlunos, char* nome) {
+    	int index;
+		for (index = 0; index < listaAlunos->numElem; index++) {
+        if (strcmp(listaAlunos->alunos[index].nome, nome) == 0) {
+            return index;
+        }
+    }
+    return -1;
+}
+
+int buscaAlunoPorMatricula(ListaAlunos* listaAlunos, int matricula) {
+    int index;
+	for (index = 0; index < listaAlunos->numElem; index++) {
+        if (listaAlunos->alunos[index].matricula == matricula) {
+            return index;
+        }
+    }
+    return -1;
+}
+
+Aluno retornaEnesimoAluno(ListaAlunos* listaAlunos, int n) {
+    if (n >= 0 && n < listaAlunos->numElem) {
+        return listaAlunos->alunos[n];
+    } else {
+        Aluno alunoVazio;
+        alunoVazio.matricula = -1;
+        return alunoVazio;
+    }
+}
 
 int buscaSentinelaPorNome(ListaAlunos* listaAlunos, char* nome) {
-    Aluno alunoSentinela;
-    strcpy(alunoSentinela.nome, nome);
-    int i = 0;
-
-   
-    strcpy(listaAlunos->alunos[listaAlunos->numElem].nome, nome);
-
-    while (strcmp(listaAlunos->alunos[i].nome, nome) != 0) {
-        i++;
+    
+	int index; 
+		for (index = 0; index < listaAlunos->numElem; index++) {
+        if (strcmp(listaAlunos->alunos[index].nome, nome) == 0) {
+            return index;
+        }
     }
-
-   
-    listaAlunos->numElem--;
-
-    if (i == listaAlunos->numElem) {
-        return -1; 
-    } else {
-        return i; 
-    }
+    return -1;
 }
 
 int buscaBinariaPorNome(ListaAlunos* listaAlunos, char* nome) {
@@ -60,7 +116,7 @@ int buscaBinariaPorNome(ListaAlunos* listaAlunos, char* nome) {
         int comparacao = strcmp(listaAlunos->alunos[meio].nome, nome);
 
         if (comparacao == 0) {
-            return meio; 
+            return meio;
         } else if (comparacao < 0) {
             esquerda = meio + 1;
         } else {
@@ -68,109 +124,7 @@ int buscaBinariaPorNome(ListaAlunos* listaAlunos, char* nome) {
         }
     }
 
-    return -1; 
-}
-
-
-void insereAlunoOrdenado(ListaAlunos* listaAlunos, Aluno aluno) {
-    int i;
-    for (i = 0; i < listaAlunos->numElem; i++) {
-        if (strcmp(aluno.nome, listaAlunos->alunos[i].nome) < 0) {
-            break;
-        }
-    }
-    
-    insereAlunoNaLista(listaAlunos, aluno, i);
-}
-
-void preencheAluno(Aluno* ptrAluno, 
-                   int matricula,
-                   float nota,
-                   char* nome){
-    (*ptrAluno).matricula = matricula;
-    (*ptrAluno).nota = nota;
-    strcpy((*ptrAluno).nome, nome);
-}
-
-void inicializaLista(ListaAlunos* listaAlunos){
-    listaAlunos->numElem = 0;
-}
-
-void exibeLista(ListaAlunos* listaAlunos){
-    int index;
-    printf("Exibindo lista...\n");
-    for(index = 0; index < listaAlunos->numElem;index++){
-        printf("Aluno %d\n", index);
-        printf("Nome: %s\n", listaAlunos->alunos[index].nome);
-        printf("Matricula: %d\n", listaAlunos->alunos[index].matricula);
-        printf("Nota: %.1f\n", listaAlunos->alunos[index].nota);
-    }
-}
-
-bool insereAlunoNaLista(ListaAlunos* listaAlunos, 
-                        Aluno aluno,
-                        int posicao){
-    if((listaAlunos->numElem >= MAXSIZE) || 
-       (posicao < 0) || 
-       (posicao > MAXSIZE) ||
-       (posicao > listaAlunos->numElem)){
-        printf("Insercao em posicao invalida!!!\n");
-        return false;
-    }
-    int index;
-    for(index = listaAlunos->numElem; index > posicao;index--){
-        listaAlunos->alunos[index] = listaAlunos->alunos[index-1];
-    }
-    listaAlunos->alunos[posicao] = aluno;
-    listaAlunos->numElem++;
-    return true;
-}
-
-bool excluiElementoDaLista(ListaAlunos* listaAlunos, int posicao){
-    if((listaAlunos->numElem >= MAXSIZE) || 
-       (posicao < 0) || 
-       (posicao > MAXSIZE) ||
-       (posicao > listaAlunos->numElem)){
-        printf("Exclusao em posicao invalida!!!\n");
-        return false;
-    }
-    int index;
-    for(index = posicao; index < listaAlunos->numElem - 1;index++){
-        listaAlunos->alunos[index] = listaAlunos->alunos[index+1];
-    }
-    listaAlunos->numElem--;
-    return true;
-}
-
-int buscaAlunoPorNome(ListaAlunos* listaAlunos, char* nome) {
-    for (int i = 0; i < listaAlunos->numElem; i++) {
-        if (strcmp(listaAlunos->alunos[i].nome, nome) == 0) {
-            return i; 
-        }
-    }
-    return -1; 
-}
-
-
-int buscaAlunoPorMatricula(ListaAlunos* listaAlunos, int matricula) {
-    for (int i = 0; i < listaAlunos->numElem; i++) {
-        if (listaAlunos->alunos[i].matricula == matricula) {
-            return i; 
-        }
-    }
-    return -1; 
-}
-
-
-Aluno retornaEnesimoAluno(ListaAlunos* listaAlunos, int n) {
-    if (n >= 0 && n < listaAlunos->numElem) {
-        return listaAlunos->alunos[n];
-    } else {
-     
-        Aluno alunoVazio; 
-        alunoVazio.matricula = -1; 
-        return alunoVazio;
-    }
+    return -1;
 }
 
 int main() {
@@ -185,12 +139,12 @@ int main() {
     insereAlunoNaLista(&listaAlunos, aluno0, 0);
     insereAlunoNaLista(&listaAlunos, aluno1, 0);
     insereAlunoNaLista(&listaAlunos, aluno2, 1);
-    
+
     exibeLista(&listaAlunos);
     printf("Excluindo elemento.............\n");
     excluiElementoDaLista(&listaAlunos, 1);
     exibeLista(&listaAlunos);
-    printf("nao foi apagado %s\n", listaAlunos.alunos[2].nome);
+
     int indicePorNome = buscaAlunoPorNome(&listaAlunos, "Ana");
     if (indicePorNome != -1) {
         printf("Aluno encontrado por nome:\n");
@@ -207,7 +161,7 @@ int main() {
         printf("Aluno não encontrado por matrícula.\n");
     }
 
-    int n = 1; 
+    int n = 1;
     Aluno enesimoAluno = retornaEnesimoAluno(&listaAlunos, n);
     if (enesimoAluno.matricula != -1) {
         printf("Enésimo aluno na lista (n=%d):\n", n);
@@ -217,12 +171,13 @@ int main() {
     } else {
         printf("Índice fora dos limites da lista.\n");
     }
+
     Aluno aluno3, aluno4;
     preencheAluno(&aluno3, 30303030, 8.5, "Carlos");
     preencheAluno(&aluno4, 45454545, 9.0, "Alice");
 
-    insereAlunoOrdenado(&listaAlunos, aluno3);
-    insereAlunoOrdenado(&listaAlunos, aluno4);
+    insereAlunoNaLista(&listaAlunos, aluno3, 2);
+    insereAlunoNaLista(&listaAlunos, aluno4, 3);
 
     exibeLista(&listaAlunos);
 
